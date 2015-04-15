@@ -169,6 +169,30 @@ module Quickbooks
         do_http(:get, url, {}, headers)
       end
 
+      def do_http_simple_get(url, params = {}, headers = {}) # throws IntuitRequestException
+        url = add_query_string_to_url(url, params)
+        
+        if @oauth.nil?
+          raise "OAuth client has not been initialized. Initialize with setter access_token="
+        end
+        unless headers.has_key?('Content-Type')
+          headers['Content-Type'] = HTTP_CONTENT_TYPE
+        end
+        unless headers.has_key?('Accept')
+          headers['Accept'] = HTTP_ACCEPT
+        end
+        unless headers.has_key?('Accept-Encoding')
+          headers['Accept-Encoding'] = HTTP_ACCEPT_ENCODING
+        end
+
+        log "------ QUICKBOOKS-RUBY REQUEST ------"
+        log "METHOD = GET (simple)"
+        log "RESOURCE = #{url}"
+        log "REQUEST HEADERS = #{headers.inspect}"
+
+        @oauth.get(url, headers)
+      end
+
       def do_http_file_upload(uploadIO, url, metadata = nil)
         headers = {
           'Content-Type' => 'multipart/form-data'
